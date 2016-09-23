@@ -375,7 +375,7 @@ EOT
 		$tmppackage = "Slash::Task::$tmppackage";
 
 		# replace tmppackage in string where appropriate
-		(my $addtxt = <<'EOT') =~ s/\${?tmppackage}?/$tmppackage/g;
+		(my $addtxt = <<'EOT') =~ s/\$\{?tmppackage\}?/$tmppackage/g;
 package $tmppackage;
 
 { no strict 'refs';

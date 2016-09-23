@@ -30,6 +30,8 @@ TO_UNIX = @$(NOOP)
 ENVIRONMENT_PREFIX=/opt/rehash-environment
 SLASH_PREFIX = $(ENVIRONMENT_PREFIX)/rehash
 # If this isn't used anymore, can we remove it?
+# it is still used, sorta.
+CORES = `grep -c '^processor' /proc/cpuinfo`
 INIT = /etc
 USER = nobody
 GROUP = nogroup
@@ -41,12 +43,14 @@ MAKE = make -s
 # Apache stuff
 APACHE_MIRROR=http://archive.apache.org/dist/httpd/
 APACHE_VER=2.2.29
-APACHE_DIR=httpd-$(APACHE_VER)
+HTTPD_DIR=httpd-$(APACHE_VER)
+HTTPD_FILE=$(HTTPD_DIR).tar.bz2
+APACHE_DIR=apache-$(APACHE_VER)
 APACHE_FILE=$(APACHE_DIR).tar.bz2
 
 # Perl stuff
 PERL_MIRROR=http://www.cpan.org/src/5.0/
-PERL_VER=5.20.0
+PERL_VER=5.24.0
 PERL_DIR=perl-$(PERL_VER)
 PERL_FILE=$(PERL_DIR).tar.gz
 REHASH_PERL=$(ENVIRONMENT_PREFIX)/perl-$(PERL_VER)/bin/perl
@@ -87,9 +91,9 @@ INSTALLMAN3DIR=`$(PERL) -MConfig -e 'print "$(BUILDROOT)/$$Config{installman3dir
 
 .PHONY : all pluginsandtagboxes slash install
 
-#   install the shared object file into Apache 
+#   install the shared object file into Apache
 # We should run a script on the binaries to get the right
-# version of perl. 
+# version of perl.
 # I should also grab an install-sh instead of using $(CP)
 slash:
 	@echo "=== INSTALLING SLASH MODULES ==="
@@ -143,7 +147,7 @@ install: slash pluginsandtagboxes
 	# Install the plugins and tagboxes.  Will also install kruft like CVS/
 	# and blib/ directories if they are around. Maybe a smarter copying
 	# procedure is called for, here?)
-	# 
+	#
 	# Note: Many users of Slash have taken to symlinking the plugins and themes
 	# directories into $(SLASH_PREFIX) from their checked-out CVS trees. We
 	# should try to check for this in the future and behave accordingly.
@@ -153,7 +157,7 @@ install: slash pluginsandtagboxes
 	# OpenBSD needs "-R" here instead of "-rv".  Its manpage notes:
 	# Historic versions of the cp utility had a -r option.  This implementation
 	# supports that option; however, its use is strongly discouraged, as it
-	# does not correctly copy special files, symbolic links or FIFOs. 
+	# does not correctly copy special files, symbolic links or FIFOs.
 	#
 	@(pluginstall=$(PLUGINSTALL); \
 	for f in $$pluginstall; do \
@@ -162,8 +166,8 @@ install: slash pluginsandtagboxes
 
 	# Now all the themes
 	$(CP) -r themes/* $(SLASH_PREFIX)/themes
-	
-	# Ensure we use the proper Perl interpreter and prefix in all scripts that 
+
+	# Ensure we use the proper Perl interpreter and prefix in all scripts that
 	# we install. Note the use of Perl as opposed to dirname(1) and basename(1)
 	# which may or may not exist on any given system.
 	(replacewith=$(REPLACEWITH); \
@@ -339,7 +343,7 @@ manifest :
 rpm :
 	rpm -ba slash.spec
 
-build-environment: stamp/apache-built stamp/perl-built stamp/mod-perl-built stamp/install-cpamn stamp/install-apache2-upload stamp/install-cache-memcached stamp/install-cache-memcached-fast stamp/install-data-javascript-anon stamp/install-date-calc stamp/install-date-format stamp/install-date-language stamp/install-date-parse stamp/install-datetime-format-mysql stamp/install-dbd-mysql stamp/install-digest-md5 stamp/install-email-valid stamp/install-gd stamp/install-gd-text-align stamp/install-html-entities stamp/install-html-formattext stamp/install-html-tagset stamp/install-html-tokeparser stamp/install-html-treebuilder stamp/install-http-request stamp/install-image-size stamp/install-javascript-minifier stamp/install-json stamp/install-lingua-stem stamp/install-lwp-parallel-useragent stamp/install-lwp-useragent stamp/install-mail-address stamp/install-mail-bulkmail  stamp/install-mail-sendmail stamp/install-mime-types stamp/install-mojo-server-daemon  stamp/install-net-ip stamp/install-net-server stamp/install-schedule-cron stamp/install-soap-lite stamp/install-sphinx-search stamp/install-uri-encode stamp/install-template stamp/install-xml-parser stamp/install-xml-parser-expat stamp/install-xml-rss stamp/append-apache-config
+build-environment: stamp/apache-built stamp/perl-built stamp/mod-perl-built stamp/install-cpamn stamp/install-apache2-upload stamp/install-cache-memcached stamp/install-cache-memcached-fast stamp/install-data-javascript-anon stamp/install-date-calc stamp/install-date-format stamp/install-date-language stamp/install-date-parse stamp/install-datetime-format-mysql stamp/install-dbd-mysql stamp/install-digest-md5 stamp/install-email-valid stamp/install-gd stamp/install-gd-text-align stamp/install-html-entities stamp/install-experimental stamp/install-html-formattext stamp/install-html-popuptreeselect stamp/install-html-tagset stamp/install-html-template stamp/install-html-tokeparser stamp/install-html-treebuilder stamp/install-http-request stamp/install-image-size stamp/install-javascript-minifier stamp/install-json stamp/install-lingua-stem stamp/install-lwp-parallel-useragent stamp/install-lwp-useragent stamp/install-mail-address stamp/install-mail-bulkmail stamp/install-mail-sendmail stamp/install-mime-types stamp/install-mojo-server-daemon  stamp/install-net-ip stamp/install-net-server stamp/install-schedule-cron stamp/install-soap-lite stamp/install-sphinx-search stamp/install-uri-encode stamp/install-template stamp/install-xml-parser stamp/install-xml-parser-expat stamp/install-xml-rss stamp/append-apache-config
 	@echo "Setting permissions on the $(ENVIRONMENT_PREFIX) directory"
 	chown $(USER):$(GROUP) -R $(ENVIRONMENT_PREFIX)
 	@echo ""
@@ -376,16 +380,16 @@ build-environment: stamp/apache-built stamp/perl-built stamp/mod-perl-built stam
 	@echo ""
 	@echo "Thanks for installing Rehash."
 
-get-rehash-dependencies: dist/$(APACHE_FILE) dist/$(PERL_FILE) dist/$(MOD_PERL_FILE)
+get-rehash-dependencies: dist/$(HTTPD_FILE) dist/$(PERL_FILE) dist/$(MOD_PERL_FILE)
 
-dist/$(APACHE_FILE):
+dist/$(HTTPD_FILE):
 	-mkdir dist
-	cd dist; wget $(APACHE_MIRROR)/$(APACHE_FILE)
+	cd dist; wget $(HTTPD_MIRROR)/$(HTTPD_FILE)
 
-stamp/apache-built: dist/$(APACHE_FILE)
+stamp/apache-built: dist/$(HTTPD_FILE)
 	-mkdir build stamp
-	-rm -rf build/$(APACHE_DIR)
-	cd build && tar jxf ../dist/$(APACHE_FILE); cd $(APACHE_DIR) && ./configure --prefix=$(ENVIRONMENT_PREFIX)/apache-$(APACHE_VER) --enable-mods-shared=most && make && make install
+	-rm -rf build/$(HTTPD_DIR)
+	cd build && tar jxf ../dist/$(HTTPD_FILE); cd $(HTTPD_DIR) && ./configure --prefix=$(ENVIRONMENT_PREFIX)/apache-$(APACHE_VER) --enable-mods-shared=most && make -j $(CORES) && make install
 	touch stamp/apache-built
 
 dist/$(PERL_FILE):
@@ -395,7 +399,7 @@ dist/$(PERL_FILE):
 stamp/perl-built: dist/$(PERL_FILE)
 	-mkdir build stamp
 	-rm -rf build/$(PERL_DIR)
-	cd build && tar zxf ../dist/$(PERL_FILE) && cd $(PERL_DIR) && ./Configure -des -Dprefix=$(ENVIRONMENT_PREFIX)/perl-$(PERL_VER) -Duseshrplib -Dusethreads && make && make check && make install
+	cd build && tar zxf ../dist/$(PERL_FILE) && cd $(PERL_DIR) && ./Configure -des -Dprefix=$(ENVIRONMENT_PREFIX)/perl-$(PERL_VER) -Duseshrplib -Dusethreads && make -j $(CORES) && TEST_JOBS=$(CORES) make test_harness && make install -j $(CORES)
 	touch stamp/perl-built
 
 dist/$(MOD_PERL_FILE):
@@ -405,221 +409,236 @@ dist/$(MOD_PERL_FILE):
 stamp/mod-perl-built: dist/$(MOD_PERL_FILE)
 	-mkdir build stamp
 	-rm -rf build/$(MOD_PERL_DIR)
-	cd build && tar xvf ../dist/$(MOD_PERL_FILE) && cd $(MOD_PERL_DIR) && $(REHASH_PERL) Makefile.PL MP_APXS=$(ENVIRONMENT_PREFIX)/apache-$(APACHE_VER)/bin/apxs && make && make test && make install
+	cd build && tar xvf ../dist/$(MOD_PERL_FILE) && cd $(MOD_PERL_DIR) && $(REHASH_PERL) Makefile.PL MP_APXS=$(ENVIRONMENT_PREFIX)/apache-$(APACHE_VER)/bin/apxs && make -j $(CORES) && make test && make install -j $(CORES)
 	touch stamp/mod-perl-built
 
 stamp/install-cpamn:
 	-mkdir stamp
 	$(REHASH_PERL) utils/cpanm App::cpanminus
-	touch stamp/install-cpamn	
+	touch stamp/install-cpamn
 
 stamp/install-apache2-upload:
 	-mkdir stamp
-	$(REHASH_CPANM) Apache2::Upload
+	$(REHASH_CPANM) -n -q Apache2::Upload | xargs -n 1 -P $(CORES)
 	touch stamp/install-apache2-upload
 
 stamp/install-cache-memcached:
 	-mkdir stamp
-	$(REHASH_CPANM) Cache::Memcached
+	$(REHASH_CPANM) -n -q Cache::Memcached | xargs -n 1 -P $(CORES)
 	touch stamp/install-cache-memcached
 
 stamp/install-cache-memcached-fast:
 	-mkdir stammp
-	$(REHASH_CPANM) Cache::Memcached::Fast
+	$(REHASH_CPANM) -n -q Cache::Memcached::Fast | xargs -n 1 -P $(CORES)
 	touch stamp/install-cache-memcached-fast
 
 stamp/install-data-javascript-anon:
 	-mkdir stamp
-	$(REHASH_CPANM) Data::JavaScript::Anon
+	$(REHASH_CPANM) -n -q Data::JavaScript::Anon | xargs -n 1 -P $(CORES)
 	touch stamp/install-data-javascript-anon
 
 stamp/install-date-calc:
 	-mkdir stamp
-	$(REHASH_CPANM) Date::Calc
+	$(REHASH_CPANM) -n -q Date::Calc | xargs -n 1 -P $(CORES)
 	touch stamp/install-date-calc
 
 stamp/install-date-format:
 	-mkdir stamp
-	$(REHASH_CPANM) Date::Format
+	$(REHASH_CPANM) -n -q Date::Format | xargs -n 1 -P $(CORES)
 	touch stamp/install-date-format
 
 stamp/install-date-language:
 	-mkdir stamp
-	$(REHASH_CPANM) Date::Language
+	$(REHASH_CPANM) -n -q Date::Language | xargs -n 1 -P $(CORES)
 	touch stamp/install-date-language
 
 stamp/install-date-parse:
 	-mkdir stamp
-	$(REHASH_CPANM) Date::Parse
+	$(REHASH_CPANM) -n -q Date::Parse
 	touch stamp/install-date-parse
 
 stamp/install-datetime-format-mysql:
 	-mkdir stamp
-	$(REHASH_CPANM) DateTime::Format::MySQL
+	$(REHASH_CPANM) -n -q DateTime::Format::MySQL | xargs -n 1 -P $(CORES)
 	touch stamp/install-datetime-format-mysql
 
 stamp/install-dbd-mysql:
 	-mkdir stamp
-	$(REHASH_CPANM) DBD::mysql
+	$(REHASH_CPANM) -n -q DBD::mysql | xargs -n 1 -P $(CORES)
 	touch stamp/install-dbd-mysql
 
 stamp/install-digest-md5:
 	-mkdir stamp
-	$(REHASH_CPANM) Digest::MD5
+	$(REHASH_CPANM) -n -q Digest::MD5 | xargs -n 1 -P $(CORES)
 	touch stamp/install-digest-md5
 
 stamp/install-email-valid:
 	-mkdir stamp
-	$(REHASH_CPANM) Email::Valid
+	$(REHASH_CPANM) -n -q Email::Valid | xargs -n 1 -P $(CORES)
 	touch stamp/install-email-valid
+
+stamp/install-experimental:
+		-mkdir stamp
+		$(REHASH_CPANM) -n -q experimental | xargs -n 1 -P $(CORES)
+		touch stamp/install-experimental-smartmatch
 
 stamp/install-gd:
 	-mkdir stamp
-	$(REHASH_CPANM) GD
+	$(REHASH_CPANM) -n -q GD | xargs -n 1 -P $(CORES)
 	touch stamp/install-gd
 
 stamp/install-gd-text-align:
 	-mkdir stamp
-	$(REHASH_CPANM) GD::Text::Align
+	$(REHASH_CPANM) -n -q GD::Text::Align | xargs -n 1 -P $(CORES)
 	touch stamp/install-gd-text-align
 
 stamp/install-html-entities:
 	-mkdir stamp
-	$(REHASH_CPANM) HTML::Entities
+	$(REHASH_CPANM) -n -q HTML::Entities | xargs -n 1 -P $(CORES)
 	touch stamp/install-html-entities
 
 stamp/install-html-formattext:
 	-mkdir stamp
-	$(REHASH_CPANM) HTML::FormatText
+	$(REHASH_CPANM) -n -q HTML::FormatText | xargs -n 1 -P $(CORES)
 	touch stamp/install-html-formattext
+
+stamp/install-html-popuptreeselect:
+	-mkdir stamp
+	$(REHASH_CPANM) -n -q --force HTML::PopupTreeSelect | xargs -n 1 -P $(CORES)
+	touch stamp/install-html-popuptreeselect
 
 stamp/install-html-tagset:
 	-mkdir stamp
-	$(REHASH_CPANM) HTML::Tagset
+	$(REHASH_CPANM) -n -q HTML::Tagset | xargs -n 1 -P $(CORES)
 	touch stamp/install-html-tagset
+
+stamp/install-html-template:
+	-mkdir stamp
+	$(REHASH_CPANM) -n -q --force HTML::Template | xargs -n 1 -P $(CORES)
+	touch stamp/install-html-template
 
 stamp/install-html-tokeparser:
 	-mkdir stamp
-	$(REHASH_CPANM) HTML::TokeParser
+	$(REHASH_CPANM) -n -q HTML::TokeParser | xargs -n 1 -P $(CORES)
 	touch stamp/install-html-tokeparser
 
 stamp/install-html-treebuilder:
 	-mkdir stamp
-	$(REHASH_CPANM) HTML::TreeBuilder
+	$(REHASH_CPANM) -n -q HTML::TreeBuilder | xargs -n 1 -P $(CORES)
 	touch stamp/install-html-treebuilder
 
 stamp/install-http-request:
 	-mkdir stamp
-	$(REHASH_CPANM) HTTP::Request
+	$(REHASH_CPANM) -n -q HTTP::Request | xargs -n 1 -P $(CORES)
 	touch stamp/install-http-request
 
 stamp/install-image-size:
 	-mkdir stamp
-	$(REHASH_CPANM) Image::Size
+	$(REHASH_CPANM) -n -q Image::Size | xargs -n 1 -P $(CORES)
 	touch stamp/install-image-size
 
 stamp/install-javascript-minifier:
 	-mkdir stamp
-	$(REHASH_CPANM) JavaScript::Minifier
+	$(REHASH_CPANM) -n -q JavaScript::Minifier | xargs -n 1 -P $(CORES)
 	touch stamp/install-javascript-minifier
 
 stamp/install-json:
 	-mkdir stamp
-	$(REHASH_CPANM) JSON
+	$(REHASH_CPANM) -n -q JSON | xargs -n 1 -P $(CORES)
 	touch stamp/install-json
 
 stamp/install-lingua-stem:
 	-mkdir stamp
-	$(REHASH_CPANM) Lingua::Stem
+	$(REHASH_CPANM) -n -q Lingua::Stem | xargs -n 1 -P $(CORES)
 	touch stamp/install-lingua-stem
 
 stamp/install-lwp-parallel-useragent:
 	-mkdir stamp
-	$(REHASH_CPANM) LWP::Parallel::UserAgent
+	$(REHASH_CPANM) -n -q LWP::Parallel::UserAgent | xargs -n 1 -P $(CORES)
 	touch stamp/install-lwp-parallel-useragent
 
 stamp/install-lwp-useragent:
 	-mkdir stamp
-	$(REHASH_CPANM) LWP::UserAgent
+	$(REHASH_CPANM) -n -q LWP::UserAgent | xargs -n 1 -P $(CORES)
 	touch stamp/install-lwp-useragent
 
 stamp/install-mail-address:
 	-mkdir stamp
-	$(REHASH_CPANM) Mail::Address
+	$(REHASH_CPANM) -n -q Mail::Address | xargs -n 1 -P $(CORES)
 	touch stamp/install-mail-address
 
 stamp/install-mail-bulkmail:
 	-mkdir stamp
-	$(REHASH_CPANM) Mail::Bulkmail
+	$(REHASH_CPANM) -n -q Mail::Bulkmail | xargs -n 1 -P $(CORES)
 	touch stamp/install-mail-bulkmail
 
 stamp/install-mail-sendmail:
 	-mkdir stamp
-	$(REHASH_CPANM) Mail::Sendmail
+	$(REHASH_CPANM) -n -q Mail::Sendmail | xargs -n 1 -P $(CORES)
 	touch stamp/install-mail-sendmail
 
 stamp/install-mime-types:
 	-mkdir stamp
-	$(REHASH_CPANM) MIME::Types
+	$(REHASH_CPANM) -n -q MIME::Types | xargs -n 1 -P $(CORES)
 	touch stamp/install-mime-types
 
 stamp/install-mojo-server-daemon:
 	-mkdir stamp
-	$(REHASH_CPANM) Mojo::Server::Daemon
+	$(REHASH_CPANM) -n -q Mojo::Server::Daemon | xargs -n 1 -P $(CORES)
 	touch stamp/install-mojo-server-daemon
 
 stamp/install-net-ip:
 	-mkdir stamp
-	$(REHASH_CPANM) Net::IP
+	$(REHASH_CPANM) -n -q Net::IP | xargs -n 1 -P $(CORES)
 	touch stamp/install-net-ip
 
 stamp/install-net-server:
 	-mkdir stamp
-	$(REHASH_CPANM) Net::Server
+	$(REHASH_CPANM) -n -q Net::Server | xargs -n 1 -P $(CORES)
 	touch stamp/install-net-server
 
 stamp/install-schedule-cron:
 	-mkdir stamp
-	$(REHASH_CPANM) Schedule::Cron
+	$(REHASH_CPANM) -n -q Schedule::Cron | xargs -n 1 -P $(CORES)
 	touch stamp/install-schedule-cron
 
 stamp/install-soap-lite:
 	-mkdir stamp
-	$(REHASH_CPANM) SOAP::Lite
+	$(REHASH_CPANM) -n -q SOAP::Lite | xargs -n 1 -P $(CORES)
 	touch stamp/install-soap-lite
 
 stamp/install-sphinx-search:
 	-mkdir stamp
-	$(REHASH_CPANM) Sphinx::Search
+	$(REHASH_CPANM) -n -q Sphinx::Search | xargs -n 1 -P $(CORES)
 	touch stamp/install-sphinx-search
 
 stamp/install-uri-encode:
 	-mkdir stamp
-	$(REHASH_CPANM) URI::Encode
+	$(REHASH_CPANM) -n -q URI::Encode | xargs -n 1 -P $(CORES)
 	touch stamp/install-uri-encode
 
 stamp/install-template:
 	-mkdir stamp
-	$(REHASH_CPANM) Template
+	$(REHASH_CPANM) -n -q Template | xargs -n 1 -P $(CORES)
 	touch stamp/install-template
 
 stamp/install-xml-parser:
 	-mkdir stamp
-	$(REHASH_CPANM) XML::Parser
+	$(REHASH_CPANM) -n -q XML::Parser | xargs -n 1 -P $(CORES)
 	touch stamp/install-xml-parser
 
 stamp/install-xml-parser-expat:
 	-mkdir stamp
-	$(REHASH_CPANM) XML::Parser::Expat
+	$(REHASH_CPANM) -n -q XML::Parser::Expat | xargs -n 1 -P $(CORES)
 	touch stamp/install-xml-parser-expat
 
 stamp/install-xml-rss:
 	-mkdir stamp
-	$(REHASH_CPANM) XML::RSS
+	$(REHASH_CPANM) -n -q XML::RSS | xargs -n 1 -P $(CORES)
 	touch stamp/install-xml-rss
 
 install-dbix-password:
-	$(REHASH_CPANM) --interactive DBIx::Password
+	$(REHASH_CPANM) -n -q --interactive DBIx::Password
 
 stamp/append-apache-config:
 	@echo "Appending Apache's configuration with necessary module configuration"

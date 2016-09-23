@@ -10,6 +10,7 @@ use Slash::Display;
 use Slash::Utility;
 
 use base 'Exporter';
+use experimental 'smartmatch';
 
 our $VERSION = $Slash::Constants::VERSION;
 our @EXPORT  = qw(getUserSlashboxes displaySlashboxes);
@@ -54,7 +55,7 @@ sub displaySlashboxes {
 	my $dynamic_blocks_reader = getObject("Slash::DynamicBlocks");
 
 
-	
+
 	my $sb = $reader->getSectionBlocks();
 	for my $ary (@$sb) {
 		my($bid, $title, $always_on) = @$ary;
@@ -97,7 +98,7 @@ sub displaySlashboxes {
 					$getblocks
 				);
 			}
-			
+
 		} elsif ($bid eq 'friends_journal' && $constants->{plugin}{Journal} && $constants->{plugin}{Zoo}) {
 			my $journal = getObject("Slash::Journal", { db_type => 'reader' });
 			my $zoo = getObject("Slash::Zoo", { db_type => 'reader' });
