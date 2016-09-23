@@ -703,4 +703,3 @@ and COPYING for more information, or see http://slashcode.com/.
 EOT
 	exit 0;
 }
-
