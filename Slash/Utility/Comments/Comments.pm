@@ -51,7 +51,7 @@ sub selectComments {
 	my $mod_reader = getObject("Slash::$constants->{m1_pluginname}", { db_type => 'reader' });
 	my $user = getCurrentUser();
 	my $form = getCurrentForm();
-	my($min, $max) = ($constants->{comment_minscore}, 
+	my($min, $max) = ($constants->{comment_minscore},
 			  $constants->{comment_maxscore});
 	my $num_scores = $max - $min + 1;
 # print STDERR scalar(gmtime) . " selectComments cid undef for $discussion\n" if !defined($cid);
@@ -61,7 +61,7 @@ sub selectComments {
 
 #slashProf("sC setup");
 
-	# it's a bit of a drag, but ... oh well! 
+	# it's a bit of a drag, but ... oh well!
 	# print_cchp gets messed up with d2, so we just punt and have
 	# selectComments called twice if necessary, the first time doing
 	# print_cchp, then blanking that out so it is not done again -- pudge
@@ -237,14 +237,14 @@ sub selectComments {
 ##slashProf("sC fudging", "sC main sort");
 #slashProf("", "sC main sort");
 
-	# This loop mainly takes apart the array and builds 
+	# This loop mainly takes apart the array and builds
 	# a hash with the comments in it.  Each comment is
 	# in the index of the hash (based on its cid).
 	for my $C (@$thisComment) {
 		# Let us fill the hash range for hitparade
-		$comments->{0}{totals}[$comments->{0}{total_keys}{$C->{points}}]++;  
+		$comments->{0}{totals}[$comments->{0}{total_keys}{$C->{points}}]++;
 
-		# So we save information. This will only have data if we have 
+		# So we save information. This will only have data if we have
 		# happened through this cid while it was a pid for another
 		# comments. -Brian
 		my $tmpkids = $comments->{$C->{cid}}{kids};
@@ -731,8 +731,8 @@ sub getPoints {
 		$hr->{karma_bonus} =
 			$user->{karma_bonus};
 	}
-	
-	
+
+
 	my $subscriber_bonus = 0;
 	if ($constants->{plugin}{Subscribe} && $constants->{subscribe} && $constants->{subscriber_bonus}) {
 		my $hide_subscription = $reader->getUser($C->{uid}, 'hide_subscription');
@@ -740,7 +740,7 @@ sub getPoints {
 			$subscriber_bonus = 1;
 		}
 	}
-	
+
 	# And, the poster-was-a-subscriber bonus
 	if ($user->{subscriber_bonus} && $subscriber_bonus) {
 		$hr->{subscriber_bonus} =
@@ -773,7 +773,7 @@ sub _print_cchp {
 	$hp_ar ||= [ ];
 	my $constants = getCurrentStatic();
 
-	my($min, $max) = ($constants->{comment_minscore}, 
+	my($min, $max) = ($constants->{comment_minscore},
 			  $constants->{comment_maxscore});
 	my $num_scores = $max - $min + 1;
 	push @$hp_ar, 0 while scalar(@$hp_ar) < $num_scores;
@@ -930,13 +930,13 @@ sub _can_mod {
 	# override the ACL and seclev tests.
 	return 0 if !$comment;
 	return 0 unless defined($comment->{cid});
-	
+
 	return 0 if
 		    $user->{is_anon}
 		|| !$constants->{m1}
 		||  $comment->{no_moderation}
 		||  _is_mod_banned($user);
-	
+
 	# More easy tests.  If any of these is true, the user has
 	# authorization to mod any comments, regardless of any of
 	# the tests that come later.
@@ -953,16 +953,16 @@ sub _can_mod {
 	if(defined($user->{uid}) && defined($comment->{uid})) {
 		return 0 if $user->{uid} eq $comment->{uid};
 	}
-	
+
 	return 0 if $user->{points} <= 0 || !$user->{willing};
-		
+
 	return 0 if defined($comment->{ipid}) && $comment->{ipid} eq $user->{ipid};
-		
+
 	return 0 if
 		    $constants->{mod_same_subnet_forbid}
 		&&	defined($comment->{subnetid})
 		&&  $comment->{subnetid} eq $user->{subnetid};
-	
+
 	return 0 if
 		   !$constants->{comments_moddable_archived}
 		&&  $user->{state}{discussion_archived};
@@ -1029,7 +1029,7 @@ sub printComments {
 	my $pretext = '';
 	$options ||= {};
 
-	
+
 
 	if (!$discussion || !$discussion->{id}) {
 		my $retval =  Slash::getData('no_such_sid', '', '');
@@ -1102,7 +1102,7 @@ sub printComments {
 		&& $cc > $user->{commentspill}
 		&& ( $user->{commentlimit} > $cc ||
 		     $user->{commentlimit} > $user->{commentspill} );
-	
+
 	my $archive_text;
 	if ($discussion->{type} eq 'archived'
 		|| ($discussion->{is_future} && !$constants->{subscribe_future_post})
@@ -1232,7 +1232,7 @@ sub printComments {
 
 		if (@abbrev) {
 			my $abbrev_comments = join ',', map { "$_:$comments->{$_}{abbreviated}" } @abbrev;
-			$comment_html =~ s|D2\.abbrev_comments\({}\);|D2.abbrev_comments({$abbrev_comments});|;
+			$comment_html =~ s|D2\.abbrev_comments\(\{\}\);|D2.abbrev_comments(\{$abbrev_comments\});|;
 		}
 	}
 
@@ -1428,8 +1428,8 @@ sub displayThread {
 			sid		=> $sid,
 			threshold	=> $constants->{comment_minscore},
 			pid		=> $pid,
-			subject		=> Slash::getData('displayThreadLink', { 
-						hidden => $hidden 
+			subject		=> Slash::getData('displayThreadLink', {
+						hidden => $hidden
 					   }, ''),
 			subject_only	=> 1,
 		});
@@ -1539,7 +1539,7 @@ sub preProcessComment {
 		sig		=> $comm->{sig},
 	};
 
-	return $comment;	
+	return $comment;
 }
 
 
@@ -1897,7 +1897,7 @@ sub dispComment {
 			$_ = noFollow($_);
 		}
 	}
-	
+
 	my $subscriber_badge=0;
 	if ($constants->{plugin}{Subscribe} && $constants->{subscribe}) {
 		my $hide_subscription = $reader->getUser($comment->{uid}, 'hide_subscription');
@@ -2090,7 +2090,7 @@ sub _hard_dispComment {
 			);
 		}
 		#$userinfo_to_display = "<br>($userinfo_to_display)" if $userinfo_to_display;
-		
+
 
 		$user_nick_to_display = qq{<a href="$constants->{real_rootdir}/~$nick_param">$nick_literal ($comment->{uid})</a>};
 		if ($constants->{plugin}{Subscribe} && $constants->{subscribe} && isSubscriber($comment->{uid}) && !$hide_subscription) {
@@ -2164,7 +2164,7 @@ EOT
 		push @link, qq'<div id="reasondiv_$comment->{cid}" class="modsel">' .
 			createSelect("reason_$comment->{cid}", $reasons, {
 				'return'	=> 1,
-				nsort		=> 1, 
+				nsort		=> 1,
 				onchange	=> ($discussion2 ? 'return D2.doModerate(this)' : '')
 			}) . "</div>" if $can_mod
 				&& ( !$user->{state}{discussion_archived}
@@ -2243,7 +2243,7 @@ EOT
 		}
 	}
 
-	my $class = $comment->{class}; 
+	my $class = $comment->{class};
 	my $classattr = $discussion2 ? qq[ class="$class"] : '';
 	my $contain = $class eq 'full' && $discussion2 ? ' contain' : '';
 
@@ -2274,7 +2274,7 @@ $comment_links
 			<span class="otherdetails" id="comment_otherdetails_$comment->{cid}">$otherdetails</span>
 		</div>
 	</div>
-	<div class="commentBody">	
+	<div class="commentBody">
 		$comment_to_display
 	</div>
 
@@ -2312,7 +2312,7 @@ sub validateComment {
 	my $form = getCurrentForm();
 	my $moddb = getObject("Slash::$constants->{m1_pluginname}");
 	my $reader = getObject('Slash::DB', { db_type => 'reader' });
-	
+
 	my $form_success = 1;
 	my $message = '';
 
@@ -2393,7 +2393,7 @@ sub validateComment {
 	# See also comments_maxposts in formkeyErrors - Jamie 2005/05/30
 
 	my $min_cid_1_day_old = $slashdb->getVar('min_cid_last_1_days','value', 1) || 0;
-	
+
 	if (($user->{is_anon} || $form->{postanon}) && $constants->{comments_perday_anon}
 		&& !$user->{is_admin}) {
 		my($num_comm, $sum_mods) = $reader->getNumCommPostedAnonByIPID(
@@ -2464,7 +2464,7 @@ sub validateComment {
 			my $logged_in_allowed = !$post_restrictions->{no_post};
 			$$error_message = getError('troll message', {
 				unencoded_ip 		=> $ENV{REMOTE_ADDR},
-				logged_in_allowed 	=> $logged_in_allowed  
+				logged_in_allowed 	=> $logged_in_allowed
 			});
 			return;
 		}
