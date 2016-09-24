@@ -536,6 +536,7 @@ sub apache_site_conf {
     Allow from all
 </Directory>
 
+SiteName $sitename
 <VirtualHost $host_port>
     ServerAdmin $email
     DocumentRoot $prefix_site/$sitename/htdocs
@@ -557,7 +558,7 @@ $include
     # setting template_cache_size to 100 or so is
     # probably a lot better
     SlashCompileTemplates Off
- 
+
     ########################
 
     # First Apache phase:  post-read-request
@@ -584,9 +585,9 @@ $include
     PerlAccessHandler  Slash::Apache::User
 
     # Fifth Apache phase:  authentication
-        
+
     # Sixth Apache phase:  authorization
-        
+
     # Seventh Apache phase:  MIME type checking
 
     # Eighth Apache phase:  fixups
