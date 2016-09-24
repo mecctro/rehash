@@ -536,7 +536,7 @@ sub apache_site_conf {
     Allow from all
 </Directory>
 
-SiteName $sitename
+ServerName $sitename
 <VirtualHost $host_port>
     ServerAdmin $email
     DocumentRoot $prefix_site/$sitename/htdocs
