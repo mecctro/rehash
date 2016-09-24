@@ -310,7 +310,7 @@ sub setUserMessagesBlock {
 			slashDisplay('createmessages',
 				{ messages => $messages, messagecount => $count,},
 				{ Page => 'dynamicblocks', Return => 1 });
-			
+
 		$block->{block} = $messages_block;
 		$block->{url} = 'my/messages';
 		$block->{title} = 'Messages';
@@ -347,7 +347,7 @@ sub setRemarkAsMessage {
 }
 
 # Returns a named block
-sub getDynamicBlock { 
+sub getDynamicBlock {
 	my ($self, $name, $options) = @_;
 
 	my $slashdb = getCurrentDB();
@@ -405,7 +405,7 @@ sub getPortalBlocks {
 
 		$blocks->{$block}{type} = $block_definition->{type};
 		$blocks->{$block}{private} = $block_definition->{private};
-	
+
 		($blocks->{$block}{block}, $blocks->{$block}{title}, $blocks->{$block}{url}) =
 			$self->getPortalBlockContent($blocks->{$block}{portal_id});
 	}
@@ -505,7 +505,7 @@ sub getPortalBlockContent {
 
 # Returns a hash describing a block type
 # e.g. private/user, public/admin, public/portal
-# 
+#
 # getBlockDefinition($type_id)
 # getBlockDefinition("", { type => "admin", private => "no" })
 # getBlockDefinition("", { type => "user", private => "yes" })
@@ -583,7 +583,7 @@ sub syncPortalBlocks {
 
 # Returns: a hash of blocks which have been updated between $options->{min_time} and now().
 # Will return 0 on error or if no blocks will be updated.
-# This will normally be used with an Ajax call. 
+# This will normally be used with an Ajax call.
 #
 # $list: a comma delimited list of blocks to check.
 # $options->{min_time}: yyyy-mm-dd hh:mm:ss format. The base time for which you'd like
@@ -696,39 +696,6 @@ sub displayBlock {
 		slashDisplay('displayblock',
 			{ block => $block, supplement => $supplement },
 			{ Page => 'dynamicblocks', Return => 1 });
-}
-
-sub ajaxDeleteMessage {
-	my ($self, $constants, $user, $form, $options) = @_;
-
-	my $messages = getObject('Slash::Messages');
-	my $dynamic_blocks = getObject('Slash::DynamicBlocks');
-	return 0 if (!$messages ||
-		!$dynamic_blocks ||
-		!$user->{uid} ||
-		!$form->{val} ||
-		($user->{uid} == $constants->{anonymous_coward_uid})
-	);
-
-	my $ids = [];
-	@$ids = split(/,/, $form->{val});
-	foreach my $id (@$ids) {
-		my $message = $messages->getWeb($id);
-		next if ($user->{uid} != $message->{user}{uid});
-		$messages->_delete_web($id, $user->{uid});
-	}
-
-	my $gb_options = {};
-	$gb_options->{strip_list} = 1 if ($form->{strip_list} == 1);
-	$gb_options->{user_bio_messages} = 1 if ($form->{user_bio_messages} == 1);
-	my $block = $dynamic_blocks->getDynamicBlock('messages-' . $user->{uid}, $gb_options);
-
-	if ($block && $block->{block}) {
-		$block->{user_bio_messages} = 1 if ($form->{user_bio_messages} == 1);
-		$block->{strip_list} = 1 if ($form->{strip_list} == 1);
-	}
-
-	return Data::JavaScript::Anon->anon_dump($block);
 }
 
 sub DESTROY {
