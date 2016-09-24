@@ -4,13 +4,12 @@
 
 DROP TABLE IF EXISTS ajax_ops;
 CREATE TABLE ajax_ops (
-	id mediumint(5) UNSIGNED NOT NULL auto_increment,
-	op VARCHAR(50) DEFAULT '' NOT NULL,
-	class VARCHAR(100) DEFAULT '' NOT NULL,
-	subroutine VARCHAR(100) DEFAULT '' NOT NULL,
-	reskey_name VARCHAR(64) DEFAULT '' NOT NULL,
-	reskey_type VARCHAR(64) DEFAULT '' NOT NULL,
-	PRIMARY KEY (id),
-	UNIQUE op (op)
+	id mediumint(5) unsigned NOT NULL AUTO_INCREMENT,
+	op varchar(50) NOT NULL DEFAULT '',
+	class varchar(100) NOT NULL DEFAULT '',
+	subroutine varchar(100) NOT NULL DEFAULT '',
+	reskey_name varchar(64) NOT NULL DEFAULT '',
+	reskey_type varchar(64) NOT NULL DEFAULT '',
+	PRIMARY KEY (`id`),
+	UNIQUE KEY op (op)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
