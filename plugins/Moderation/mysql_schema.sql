@@ -2,6 +2,20 @@
 # $Id$
 #
 
+ALTER TABLE users_info ADD COLUMN mod_banned date DEFAULT '1000-01-01' AFTER lastaccess_ts;
+ALTER TABLE users_comments ADD COLUMN points tinyint DEFAULT '0' NOT NULL AFTER nosigs;
+
+CREATE TABLE ajax_ops (
+	id mediumint(5) unsigned NOT NULL AUTO_INCREMENT,
+	op varchar(50) NOT NULL DEFAULT '',
+	class varchar(100) NOT NULL DEFAULT '',
+	subroutine varchar(100) NOT NULL DEFAULT '',
+	reskey_name varchar(64) NOT NULL DEFAULT '',
+	reskey_type varchar(64) NOT NULL DEFAULT '',
+	PRIMARY KEY (`id`),
+	UNIQUE KEY op (op)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS moderatorlog (
 	id int UNSIGNED NOT NULL auto_increment,
 	ipid char(32) DEFAULT '' NOT NULL,
@@ -40,4 +54,3 @@ CREATE TABLE IF NOT EXISTS modreasons (
 	needs_prior_mod tinyint UNSIGNED DEFAULT '0' NOT NULL,
 	PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-

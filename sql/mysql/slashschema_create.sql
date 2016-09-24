@@ -29,7 +29,7 @@ CREATE TABLE abusers (
 	KEY ts (ts)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-DROP TABLE IF EXISTS accesslog; 
+DROP TABLE IF EXISTS accesslog;
 CREATE TABLE accesslog (
 	id int UNSIGNED NOT NULL auto_increment,
 	host_addr char(32)	DEFAULT '' NOT NULL,
@@ -75,17 +75,7 @@ CREATE TABLE accesslog_admin (
 	PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-DROP TABLE IF EXISTS ajax_ops;
-CREATE TABLE ajax_ops (
-	id mediumint(5) unsigned NOT NULL AUTO_INCREMENT,
-	op varchar(50) NOT NULL DEFAULT '',
-	class varchar(100) NOT NULL DEFAULT '',
-	subroutine varchar(100) NOT NULL DEFAULT '',
-	reskey_name varchar(64) NOT NULL DEFAULT '',
-	reskey_type varchar(64) NOT NULL DEFAULT '',
-	PRIMARY KEY (`id`),
-	UNIQUE KEY op (op)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 
 DROP TABLE IF EXISTS accesslog_artcom;
 CREATE TABLE accesslog_artcom (
@@ -221,7 +211,7 @@ CREATE TABLE blocks (
 	retrieve tinyint NOT NULL DEFAULT '0',
 	last_update timestamp NOT NULL,
 	rss_template varchar(30),
-	items smallint NOT NULL DEFAULT '0', 
+	items smallint NOT NULL DEFAULT '0',
 	autosubmit ENUM('no','yes') DEFAULT 'no' NOT NULL,
 	rss_cookie varchar(255),
 	all_skins tinyint NOT NULL DEFAULT '0',
@@ -352,7 +342,7 @@ CREATE TABLE comment_promote_log (
 	ts datetime NOT NULL default '1970-01-01 00:00:00',
 	PRIMARY KEY  (id),
 	KEY cid (cid)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci; 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 
 
@@ -492,7 +482,7 @@ CREATE TABLE dbs_readerstatus_queries (
 
 DROP TABLE IF EXISTS discussions;
 CREATE TABLE discussions (
-	id mediumint UNSIGNED NOT NULL auto_increment, 
+	id mediumint UNSIGNED NOT NULL auto_increment,
 	dkid TINYINT UNSIGNED NOT NULL DEFAULT 1,
 	stoid mediumint UNSIGNED DEFAULT '0' NOT NULL,
 	sid char(16) DEFAULT '' NOT NULL,
@@ -871,7 +861,7 @@ CREATE TABLE rss_raw (
 	description text,
 	subid mediumint UNSIGNED,
 	bid varchar(30),
-	created datetime, 
+	created datetime,
 	processed ENUM("no","yes") DEFAULT 'no' NOT NULL,
 	UNIQUE uber_signature (link_signature, title_signature, description_signature),
 	PRIMARY KEY (id),
@@ -946,7 +936,7 @@ CREATE TABLE signoff (
 	PRIMARY KEY(soid),
 	INDEX (stoid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-				
+
 #
 # Table structure for table 'site_info'
 #
@@ -1230,7 +1220,7 @@ CREATE TABLE submissions (
 	ipid char(32) DEFAULT '' NOT NULL,
 	subnetid char(32) DEFAULT '' NOT NULL,
 	del tinyint DEFAULT '0' NOT NULL,
-	weight float DEFAULT '0' NOT NULL, 
+	weight float DEFAULT '0' NOT NULL,
 	signature varchar(32) NOT NULL,
 	mediatype enum("text", "none", "video", "image", "audio") default "none" NOT NULL,
 	PRIMARY KEY (subid),
@@ -1574,8 +1564,7 @@ CREATE TABLE users_info (
 	created_at datetime DEFAULT '1970-01-01 00:00' NOT NULL,
 	people MEDIUMBLOB,
 	lastaccess_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        skin varchar(255) DEFAULT NULL,
-        mod_banned date DEFAULT '1000-01-01',
+  skin varchar(255) DEFAULT NULL,
 	PRIMARY KEY (uid),
 	KEY (initdomain),
 	KEY (created_ipid),
@@ -1733,4 +1722,3 @@ CREATE TABLE xsite_auth_log (
 #ALTER TABLE users_info ADD FOREIGN KEY (uid) REFERENCES users(uid);
 #ALTER TABLE users_param ADD FOREIGN KEY (uid) REFERENCES users(uid);
 #ALTER TABLE users_prefs ADD FOREIGN KEY (uid) REFERENCES users(uid);
-
