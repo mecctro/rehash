@@ -5,7 +5,7 @@
 ALTER TABLE users_info ADD COLUMN mod_banned date DEFAULT '1000-01-01' AFTER lastaccess_ts;
 ALTER TABLE users_comments ADD COLUMN points tinyint DEFAULT '0' NOT NULL AFTER nosigs;
 
-CREATE TABLE ajax_ops (
+CREATE TABLE IF NOT EXISTS ajax_ops (
 	id mediumint(5) unsigned NOT NULL AUTO_INCREMENT,
 	op varchar(50) NOT NULL DEFAULT '',
 	class varchar(100) NOT NULL DEFAULT '',
